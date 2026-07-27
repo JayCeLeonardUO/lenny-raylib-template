@@ -13,6 +13,10 @@
 #include "raylib.h"
 #include "screens.h"    // NOTE: Declares global (extern) variables and screens functions
 
+#include "rlImGui.h"    // raylib backend for Dear ImGui
+#define CIMGUI_DEFINE_ENUMS_AND_STRUCTS
+#include "cimgui.h"     // Dear ImGui C API (ig* functions)
+
 #if defined(PLATFORM_WEB)
     #include <emscripten/emscripten.h>      // Emscripten library
 #endif
@@ -77,6 +81,8 @@ int main(void)
 
     InitAudioDevice();      // Initialize audio device
 
+    rlImGuiSetup(true);     // Initialize Dear ImGui (dark theme)
+
     // Load global data (assets that must be available in all screens, i.e. font)
     font = LoadFont("resources/mecha.png");
     //music = LoadMusicStream("resources/ambient.ogg"); // TODO: Load music
@@ -119,6 +125,8 @@ int main(void)
     UnloadFont(font);
     UnloadMusicStream(music);
     UnloadSound(fxCoin);
+
+    rlImGuiShutdown();      // Shut down Dear ImGui
 
     CloseAudioDevice();     // Close audio context
 
@@ -303,6 +311,11 @@ static void UpdateDrawFrame(void)
 
         // Draw full screen rectangle in front of everything
         if (onTransition) DrawTransition();
+
+        // Dear ImGui overlay: replace the demo window with your own ig* calls
+        rlImGuiBegin();
+        igShowDemoWindow(NULL);
+        rlImGuiEnd();
 
         //DrawFPS(10, 10);
 

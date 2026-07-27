@@ -4,6 +4,9 @@
 [submodule "vendor/box3d"]
 	path = vendor/box3d
 	url = https://github.com/erincatto/box3d.git
-[submodule "vendor/imgui"]
-	path = vendor/imgui
-	url = https://github.com/ocornut/imgui.git
+[submodule "vendor/rlImGui"]
+	path = vendor/rlImGui
+	url = https://github.com/raylib-extras/rlImGui.git
+[submodule "vendor/cimgui"]
+	path = vendor/cimgui
+	url = https://github.com/cimgui/cimgui.git
