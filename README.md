@@ -11,26 +11,16 @@ All the sections defined by `$(Data to Fill)` are expected to be edited and fill
 
 ## Getting Started with this template
 
-### Windows: Visual Studio
+### Neovim
 
-- After extracting the zip, the parent folder `lenny-raylib-template` should exist in the same directory as `raylib` itself.  So, your file structure should look like this:
-    - Some parent directory
-        - `raylib`
-            - the contents of https://github.com/raysan5/raylib
-        - `lenny-raylib-template`
-            - this `README.md` and all other lenny-raylib-template files
-- If using Visual Studio, open projects/VS2022/lenny_raylib_template.sln
-- Select on `lenny_raylib_template` in the solution explorer, then in the toolbar at the top, click `Project` > `Set as Startup Project`
-- Now you're all set up!  Click `Local Windows Debugger` with the green play arrow and the project will run.
+A project-local `.nvim.lua` is included and loads automatically when launching nvim from the repo root (requires `vim.o.exrc = true` in your init.lua). It sets `makeprg` to `make -C src`, adds a `:CMakeBuild` command (which also generates `compile_commands.json` for clangd), and maps `<leader>mm` to build and `<leader>mr` to run.
 
 ### Linux
 
 When setting up this template on linux for the first time, install the dependencies from this page:
 ([Working on GNU Linux](https://github.com/raysan5/raylib/wiki/Working-on-GNU-Linux))
 
-You can use this templates in a few ways: using Visual Studio, using CMake, or make your own build setup. This repository comes with Visual Studio and CMake already set up.
-
-Chose one of the follow setup options that fit in you development environment.
+This repository comes with CMake and a plain Makefile already set up.
 
 ### CLI: Makefile
 
