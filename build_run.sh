@@ -15,7 +15,19 @@ rm -f "build/$TARGET/$TARGET"
 TMUX_DEBUG_SESSION="lenny-gdbgui-debug"
 TMUX_RUN_SESSION="lenny-game-run"
 
-if [[ "$DEBUG_MODE" == "gdb" ]]; then
+if [[ "$DEBUG_MODE" == "raddbg" ]]; then
+    "$CMAKE" -B build -DCMAKE_BUILD_TYPE=Debug && "$CMAKE" --build build || exit 1
+
+    RADDBG="$PWD/vendor/raddebugger/build/raddbg"
+    if [[ ! -x "$RADDBG" ]]; then
+        echo "raddbg not built yet; building it now (one-time)..."
+        git submodule update --init vendor/raddebugger
+        (cd vendor/raddebugger && ./build.sh raddbg release) || exit 1
+    fi
+
+    # cwd must be the binary dir so the game finds resources/
+    cd "build/$TARGET" && exec "$RADDBG" "./$TARGET"
+elif [[ "$DEBUG_MODE" == "gdb" ]]; then
     "$CMAKE" -B build -DCMAKE_BUILD_TYPE=Debug && "$CMAKE" --build build || exit 1
     gdb ./build/"$TARGET"/"$TARGET"
 elif [[ "$DEBUG_MODE" == "gdbgui" ]]; then

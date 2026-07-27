@@ -57,6 +57,24 @@ vim.keymap.set("n", "<leader>r", function()
   })
 end, { desc = "Build and debug with gdbgui" })
 
+-- Debug with the RAD Debugger (:RadDebug or <leader>D) — builds Debug, then
+-- launches vendor/raddebugger/build/raddbg on the game (detached GUI)
+vim.api.nvim_create_user_command("RadDebug", function()
+  local cmd = string.format("cd %s && ./build_run.sh raddbg", project_root)
+  vim.fn.jobstart(cmd, {
+    detach = true,
+    on_exit = function(_, code)
+      vim.schedule(function()
+        if code ~= 0 then
+          vim.cmd("echohl ErrorMsg | echo 'RadDebug: build failed!' | echohl None")
+        end
+      end)
+    end,
+  })
+  vim.notify("Building + launching raddbg...")
+end, {})
+vim.keymap.set("n", "<leader>D", "<cmd>RadDebug<cr>", { desc = "Build and debug with RAD Debugger" })
+
 -- CMake build (generates compile_commands.json for LSP/clangd)
 vim.api.nvim_create_user_command("CMakeBuild", function()
   vim.cmd("!cmake -B build && cmake --build build")

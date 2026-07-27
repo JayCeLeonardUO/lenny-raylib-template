@@ -15,6 +15,8 @@ All the sections defined by `$(Data to Fill)` are expected to be edited and fill
 
 A project-local `.nvim.lua` is included and loads automatically when launching nvim from the repo root (requires `vim.o.exrc = true` in your init.lua). It sets `makeprg` to `make -C src`, adds a `:CMakeBuild` command (which also generates `compile_commands.json` for clangd), and maps `<leader>mm` to build and `<leader>mr` to run.
 
+Other bindings: `<leader>R` (or the on-screen button) builds and runs the game in a detached tmux session, `<C-t>` toggles a pane attached to it, `<leader>r` debugs with gdbgui, and `:RadDebug` / `<leader>D` debugs with the [RAD Debugger](https://github.com/EpicGames/raddebugger) (vendored as a submodule at `vendor/raddebugger` — clone with `--recurse-submodules`; it is built automatically on first use).
+
 ### Linux
 
 When setting up this template on linux for the first time, install the dependencies from this page:

@@ -1,0 +1,3 @@
+[submodule "vendor/raddebugger"]
+	path = vendor/raddebugger
+	url = https://github.com/EpicGames/raddebugger.git
