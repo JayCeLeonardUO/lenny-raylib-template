@@ -1,10 +1,72 @@
 -- Project-local Neovim config, auto-loaded on launch when `vim.o.exrc = true`
-vim.opt.makeprg = "make -C src"
+--   <leader>R — build + run the game in a detached tmux session (popup shows build output)
+--   <C-t>     — toggle a bottom pane attached to the running game session
+--   <leader>r — build + debug with gdbgui
+-- The same build+run also hangs on screen as the clickable gold chip in the
+-- top-right corner (nvim_project_plugins/run_button.lua)
+
+-- Anchored to this file's own directory so paths work regardless of cwd
+local project_root = vim.fs.dirname(vim.fn.fnamemodify(debug.getinfo(1, "S").source:sub(2), ":p"))
+local game_session = "lenny-game-run"
+
+vim.opt.makeprg = "make -C " .. project_root .. "/src"
+
+-- Build and run in a tmux session: the popup shows the build output
+local function build_and_run()
+  local tmux_cmd = string.format(
+    "tmux display-popup -w 80%% -h 50%% 'cd %s && ./build_run.sh; exec $SHELL'",
+    project_root
+  )
+  vim.fn.system(tmux_cmd)
+end
+
+vim.keymap.set("n", "<leader>R", build_and_run, { desc = "Build and run game in tmux session" })
+
+-- The on-screen button, wired to the same runner
+dofile(project_root .. "/nvim_project_plugins/run_button.lua").setup({ run = build_and_run })
+
+-- Toggle bottom pane showing game session (Ctrl+T)
+vim.keymap.set("n", "<C-t>", function()
+  local panes = vim.fn.system("tmux list-panes -F '#{pane_id}:#{pane_current_command}'")
+  if panes:match("tmux") then
+    vim.fn.system("tmux kill-pane -t {bottom}")
+  else
+    local exists = vim.fn.system("tmux has-session -t " .. game_session .. " 2>/dev/null && echo yes || echo no")
+    if exists:match("yes") then
+      vim.fn.system("tmux split-window -v -l 30% 'tmux attach -t " .. game_session .. "'")
+    else
+      vim.notify("No game session running")
+    end
+  end
+end, { desc = "Toggle game terminal pane" })
+
+-- Debug with gdbgui (leader+r)
+vim.keymap.set("n", "<leader>r", function()
+  local cmd = string.format("cd %s && ./build_run.sh gdbgui 2>/dev/null", project_root)
+  vim.fn.jobstart(cmd, {
+    stdout_buffered = true,
+    on_exit = function(_, code)
+      vim.schedule(function()
+        if code == 0 then
+          vim.cmd("echo 'gdbgui: http://127.0.0.1:5000'")
+        else
+          vim.cmd("echohl ErrorMsg | echo 'Build failed!' | echohl None")
+        end
+      end)
+    end,
+  })
+end, { desc = "Build and debug with gdbgui" })
 
 -- CMake build (generates compile_commands.json for LSP/clangd)
 vim.api.nvim_create_user_command("CMakeBuild", function()
-    vim.cmd("!cmake -B build && cmake --build build")
+  vim.cmd("!cmake -B build && cmake --build build")
 end, {})
 
-vim.keymap.set("n", "<leader>mm", "<cmd>make<cr>", { desc = "Build (make -C src)" })
-vim.keymap.set("n", "<leader>mr", "<cmd>!src/lenny-raylib-template<cr>", { desc = "Run game" })
+-- Auto-reload this config when saved
+vim.api.nvim_create_autocmd("BufWritePost", {
+  pattern = "*/.nvim.lua",
+  callback = function()
+    dofile(vim.fn.expand("%:p"))
+    vim.notify(".nvim.lua reloaded")
+  end,
+})
