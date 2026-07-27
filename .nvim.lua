@@ -2,7 +2,7 @@
 --   <leader>R — build + run the game in a detached tmux session (popup shows build output)
 --   <C-t>     — toggle a bottom pane attached to the running game session
 --   <leader>r — build + debug with gdbgui
--- The same build+run also hangs on screen as the clickable gold chip in the
+-- Build+run and RadDebug also hang on screen as clickable chips in the
 -- top-right corner (nvim_project_plugins/run_button.lua)
 
 -- Anchored to this file's own directory so paths work regardless of cwd
@@ -22,8 +22,15 @@ end
 
 vim.keymap.set("n", "<leader>R", build_and_run, { desc = "Build and run game in tmux session" })
 
--- The on-screen button, wired to the same runner
-dofile(project_root .. "/nvim_project_plugins/run_button.lua").setup({ run = build_and_run })
+-- The on-screen buttons: run (gold, far right) and debug (cyan, to its left)
+dofile(project_root .. "/nvim_project_plugins/run_button.lua").setup({
+  buttons = {
+    { label = " ▶ build & run ", hl = "LennyRunButton", fg = "#1a1420", bg = "#ffdc3c", on_click = build_and_run },
+    { label = " 🐞 debug ", hl = "LennyDebugButton", fg = "#1a1420", bg = "#78dce8", on_click = function()
+        vim.cmd("RadDebug")
+      end },
+  },
+})
 
 -- Toggle bottom pane showing game session (Ctrl+T)
 vim.keymap.set("n", "<C-t>", function()
