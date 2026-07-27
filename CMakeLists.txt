@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.24...3.30)
-project(lenny-raylib-template)
+project(lenny-raylib-template C CXX)
 
 include(FetchContent)
 
@@ -17,6 +17,21 @@ FetchContent_Declare(
 )
 
 FetchContent_MakeAvailable(raylib)
+
+# Vendored dependencies (git submodules)
+add_subdirectory(vendor/box3d)
+
+# Dear ImGui: no upstream CMakeLists, so build the core as a static lib.
+# C++ only — use it from .cpp files (src/ globs those too), or add a C
+# binding like cimgui/rlImGui to call it from the C game code.
+add_library(imgui STATIC
+    vendor/imgui/imgui.cpp
+    vendor/imgui/imgui_draw.cpp
+    vendor/imgui/imgui_tables.cpp
+    vendor/imgui/imgui_widgets.cpp
+    vendor/imgui/imgui_demo.cpp
+)
+target_include_directories(imgui PUBLIC vendor/imgui)
 
 # Our Project
 add_executable(${PROJECT_NAME})
@@ -42,7 +57,7 @@ else()
 endif()
 
 #set(raylib_VERBOSE 1)
-target_link_libraries(${PROJECT_NAME} raylib)
+target_link_libraries(${PROJECT_NAME} raylib box3d imgui)
 
 # Web Configurations
 if ("${PLATFORM}" STREQUAL "Web")
