@@ -33,7 +33,7 @@ PROJECT_NAME          ?= lenny-raylib-template
 PROJECT_VERSION       ?= 1.0
 PROJECT_BUILD_PATH    ?= .
 PROJECT_SOURCE_FILES  ?= \
-    lenny_raylib_template.c \
+    main.c \
     screen_logo.c \
     screen_title.c \
     screen_options.c \
