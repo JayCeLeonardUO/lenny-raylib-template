@@ -26,7 +26,9 @@ if [[ "$DEBUG_MODE" == "raddbg" ]]; then
     fi
 
     # cwd must be the binary dir so the game finds resources/
-    cd "build/$TARGET" && exec "$RADDBG" "./$TARGET"
+    # --auto_step: step into the target on open, so it stops at main() with
+    # the source file showing (raddbg shows no source until a stop)
+    cd "build/$TARGET" && exec "$RADDBG" --auto_step "./$TARGET"
 elif [[ "$DEBUG_MODE" == "gdb" ]]; then
     "$CMAKE" -B build -DCMAKE_BUILD_TYPE=Debug && "$CMAKE" --build build || exit 1
     gdb ./build/"$TARGET"/"$TARGET"
