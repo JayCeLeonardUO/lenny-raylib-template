@@ -1,6 +1,6 @@
 /*******************************************************************************************
 *
-*   raylib game template
+*   lenny-raylib-template
 *
 *
 *   Code licensed under an unmodified zlib/libpng license, which is an OSI-certified,
@@ -73,7 +73,7 @@ int main(void)
 {
     // Initialization
     //---------------------------------------------------------
-    InitWindow(screenWidth, screenHeight, "raylib game template");
+    InitWindow(screenWidth, screenHeight, "lenny-raylib-template");
 
     InitAudioDevice();      // Initialize audio device
 

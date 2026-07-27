@@ -1,7 +1,7 @@
 -----------------------------------
 _DISCLAIMER:_
 
-Welcome to the **raylib game template**!
+Welcome to the **lenny-raylib-template**!
 
 This template provides a base structure to start developing a small raylib game in plain C. The repo is also pre-configured with a default `LICENSE` (zlib/libpng) and a `README.md` (this one) to be properly filled by users. Feel free to change the LICENSE as required.
 
@@ -13,14 +13,14 @@ All the sections defined by `$(Data to Fill)` are expected to be edited and fill
 
 ### Windows: Visual Studio
 
-- After extracting the zip, the parent folder `raylib-game-template` should exist in the same directory as `raylib` itself.  So, your file structure should look like this:
+- After extracting the zip, the parent folder `lenny-raylib-template` should exist in the same directory as `raylib` itself.  So, your file structure should look like this:
     - Some parent directory
         - `raylib`
             - the contents of https://github.com/raysan5/raylib
-        - `raylib-game-template`
-            - this `README.md` and all other raylib-game-template files
-- If using Visual Studio, open projects/VS2022/raylib-game-template.sln
-- Select on `raylib_game` in the solution explorer, then in the toolbar at the top, click `Project` > `Set as Startup Project`
+        - `lenny-raylib-template`
+            - this `README.md` and all other lenny-raylib-template files
+- If using Visual Studio, open projects/VS2022/lenny_raylib_template.sln
+- Select on `lenny_raylib_template` in the solution explorer, then in the toolbar at the top, click `Project` > `Set as Startup Project`
 - Now you're all set up!  Click `Local Windows Debugger` with the green play arrow and the project will run.
 
 ### Linux
@@ -41,7 +41,7 @@ make -C raylib/src
 git clone https://github.com/$(User Name)/$(Repo Name).git
 cd $(Repo Name)
 make -C src
-src/raylib_game
+src/lenny-raylib-template
 ```
 
 This template has been created to be used with raylib (www.raylib.com) and it's licensed under an unmodified zlib/libpng license.
