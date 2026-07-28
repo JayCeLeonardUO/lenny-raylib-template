@@ -46,6 +46,13 @@ static HexGridLayout board;
 static Camera3D camera = {0};
 static Model hexModel; // Hexagonal prism: the tile body
 static Model capModel; // Flat hexagon stamped on top, lighter tint to fake a lit face
+
+// Shatter-on-hover test (mylibs/shatterquad.c)
+static Texture2D shatterTex;
+static Model shatterCard;        // tessellated quad laid flat over the hovered tile
+static int hoveredTile = -1;
+static float shatterTime = 0.0f; // seconds since the hover entered the current tile
+
 typedef struct Entity
 {
     int active;
@@ -58,25 +65,31 @@ typedef struct Entity
     // asset data
     Model model;
 } Entity;
+
 struct EntityHandle
 {
     unsigned int slot;
     unsigned int generation;
 };
+
 typedef struct ArrayOfEntities
 {
     int highest_id;
     Entity entities[MAX_ENTITIES];
 } ArrayOfEntities;
+
 static ArrayOfEntities entities;
+
 static void SpawnEnity(void)
 {
     // ittorate until a free slot
 }
+
 static void KillEntity(void)
 {
     // marks entity as inactive
 }
+
 // Gameplay Screen Initialization logic
 void InitGameplayScreen(void)
 {
@@ -92,7 +105,17 @@ void InitGameplayScreen(void)
     // side faces. TILE_HEIGHT is the same constant the cap offset uses below.
     hexModel = LoadModelFromMesh(GenMeshCylinder(TILE_RADIUS * TILE_FILL, TILE_HEIGHT, 6));
     capModel = LoadModelFromMesh(GenMeshPoly(6, TILE_RADIUS * TILE_FILL));
+    // Shatter quad sized to cover a tile; the mesh is built in the XY plane,
+    // so rotate it onto the XZ board once via the model transform
+    Image checker = GenImageChecked(256, 256, 32, 32, GOLD, DARKPURPLE);
+    shatterTex = LoadTextureFromImage(checker);
+    UnloadImage(checker);
+    float cardSize = 2.0f * board.inradius * TILE_FILL;
+    shatterCard = GenTessellateQuad(cardSize, cardSize, 40, shatterTex);
+    shatterCard.transform = MatrixRotateX(-PI / 2);
+    hoveredTile = -1;
 }
+
 // Gameplay Screen Update logic
 void UpdateGameplayScreen(void)
 {
@@ -100,6 +123,29 @@ void UpdateGameplayScreen(void)
     // Must run here, not inside BeginMode3D. BeginMode3D snapshots the camera into
     // the matrix stack, so an update after it does not apply until the next frame.
     UpdateCamera(&camera, CAMERA_ORBITAL);
+    // Hover picking: nearest tile whose bounds the mouse ray hits
+    Ray ray = GetScreenToWorldRay(GetMousePosition(), camera);
+    int hit = -1;
+    float hitDist = 1e30f;
+    for (int id = 0; id < board.count; id++)
+    {
+        HexCoord cell;
+        if (!HexIdToCoord(&board, id, &cell)) continue;
+        Vector3 pos = HexToWorld(&board, cell);
+        BoundingBox box = {
+            (Vector3){pos.x - board.inradius, 0.0f, pos.z - board.inradius},
+            (Vector3){pos.x + board.inradius, TILE_HEIGHT, pos.z + board.inradius},
+        };
+        RayCollision rc = GetRayCollisionBox(ray, box);
+        if (rc.hit && (rc.distance < hitDist))
+        {
+            hit = id;
+            hitDist = rc.distance;
+        }
+    }
+    if ((hit >= 0) && (hit != hoveredTile)) shatterTime = 0.0f; // replay on each new tile
+    hoveredTile = hit;
+    shatterTime += GetFrameTime();
     // Press enter or tap to change to ENDING screen
     if (IsKeyPressed(KEY_ENTER) || IsGestureDetected(GESTURE_TAP))
     {
@@ -107,6 +153,7 @@ void UpdateGameplayScreen(void)
         PlaySound(fxCoin);
     }
 }
+
 // Gameplay Screen Draw logic
 void DrawGameplayScreen(void)
 {
@@ -124,19 +171,34 @@ void DrawGameplayScreen(void)
         capPos.y += TILE_HEIGHT + 0.002f; // Clear the prism's own top cap
         DrawModel(capModel, capPos, 1.0f, GRAY);
     }
+    // Shatter-on-hover: the quad covers the hovered tile's top and bursts
+    if (hoveredTile >= 0)
+    {
+        HexCoord cell;
+        if (HexIdToCoord(&board, hoveredTile, &cell))
+        {
+            Vector3 top = HexToWorld(&board, cell);
+            top.y += TILE_HEIGHT + 0.01f; // clear the cap stamp
+            DrawShatterEffect(shatterCard, top, shatterTime, (float)GetTime());
+        }
+    }
     EndMode3D();
     // mylibs demo: MyClampInt comes from the amalgamated mylib.h
     DrawText(TextFormat("mylib: MyClampInt(15, 0, 10) = %d", MyClampInt(15, 0, 10)), 10, 10, 20, MAROON);
     // hex distance demo: first tile to last, straight across the board
     DrawText(TextFormat("dist(0, %d) = %d", board.count - 1, HexIdDistance(&board, 0, board.count - 1)), 10, 36, 20, MAROON);
 }
+
 // Gameplay Screen Unload logic
 void UnloadGameplayScreen(void)
 {
     // UnloadModel frees the mesh it was built from, so do not also call UnloadMesh
     UnloadModel(hexModel);
     UnloadModel(capModel);
+    UnloadShatterQuad(&shatterCard);
+    UnloadTexture(shatterTex);
 }
+
 // Gameplay Screen should finish?
 int FinishGameplayScreen(void)
 {
