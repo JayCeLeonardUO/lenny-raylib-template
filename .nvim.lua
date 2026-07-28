@@ -87,6 +87,15 @@ vim.api.nvim_create_user_command("CMakeBuild", function()
   vim.cmd("!cmake -B build && cmake --build build")
 end, {})
 
+-- Format on save via clangd (.clang-format = raylib style per CONVENTIONS.md)
+-- Needed because the global conform.nvim setup disables format_on_save for c/cpp
+vim.api.nvim_create_autocmd("BufWritePre", {
+  pattern = { "*.c", "*.h", "*.cpp", "*.hpp" },
+  callback = function()
+    vim.lsp.buf.format({ async = false })
+  end,
+})
+
 -- Auto-reload this config when saved
 vim.api.nvim_create_autocmd("BufWritePost", {
   pattern = "*/.nvim.lua",
