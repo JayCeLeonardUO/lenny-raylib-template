@@ -1,30 +1,30 @@
 /*******************************************************************************************
-*
-*   lenny-raylib-template
-*
-*
-*   Code licensed under an unmodified zlib/libpng license, which is an OSI-certified,
-*   BSD-like license that allows static linking with closed source software
-*
-*   Copyright (c) 2021-2026 Ramon Santamaria (@raysan5)
-*
-********************************************************************************************/
+ *
+ *   lenny-raylib-template
+ *
+ *
+ *   Code licensed under an unmodified zlib/libpng license, which is an OSI-certified,
+ *   BSD-like license that allows static linking with closed source software
+ *
+ *   Copyright (c) 2021-2026 Ramon Santamaria (@raysan5)
+ *
+ ********************************************************************************************/
 
 #include "raylib.h"
 #define MYLIB_IMPLEMENTATION
-#include "screens.h"    // NOTE: Declares global (extern) variables and screens functions
+#include "screens.h" // NOTE: Declares global (extern) variables and screens functions
 
-#include "rlImGui.h"    // raylib backend for Dear ImGui
+#include "rlImGui.h" // raylib backend for Dear ImGui
 #define CIMGUI_DEFINE_ENUMS_AND_STRUCTS
-#include "cimgui.h"     // Dear ImGui C API (ig* functions)
+#include "cimgui.h" // Dear ImGui C API (ig* functions)
 
 #if defined(PLATFORM_WEB)
-    #include <emscripten/emscripten.h>      // Emscripten library
+#include <emscripten/emscripten.h> // Emscripten library
 #endif
 
-#include <stdio.h>                          // Required for: printf()
-#include <stdlib.h>                         // Required for: 
-#include <string.h>                         // Required for:
+#include <stdio.h>  // Required for: printf()
+#include <stdlib.h> // Required for:
+#include <string.h> // Required for:
 
 //----------------------------------------------------------------------------------
 // Defines and Macros
@@ -33,9 +33,9 @@
 // NOTE: Avoiding those calls, also avoids const strings memory usage
 #define SUPPORT_LOG_INFO
 #if defined(SUPPORT_LOG_INFO)
-    #define LOG(...) printf(__VA_ARGS__)
+#define LOG(...) printf(__VA_ARGS__)
 #else
-    #define LOG(...)
+#define LOG(...)
 #endif
 
 //----------------------------------------------------------------------------------
@@ -43,9 +43,9 @@
 // NOTE: Those variables are shared between modules through screens.h
 //----------------------------------------------------------------------------------
 GameScreen currentScreen = LOGO;
-Font font = { 0 };
-Music music = { 0 };
-Sound fxCoin = { 0 };
+Font font = {0};
+Music music = {0};
+Sound fxCoin = {0};
 
 //----------------------------------------------------------------------------------
 // Global Variables Definition (local to this module)
@@ -63,13 +63,13 @@ static GameScreen transToScreen = UNKNOWN;
 //----------------------------------------------------------------------------------
 // Module Functions Declaration
 //----------------------------------------------------------------------------------
-static void ChangeToScreen(int screen);     // Change to screen, no transition effect
+static void ChangeToScreen(int screen); // Change to screen, no transition effect
 
 static void TransitionToScreen(int screen); // Request transition to next screen
 static void UpdateTransition(void);         // Update transition effect
 static void DrawTransition(void);           // Draw transition effect (full-screen rectangle)
 
-static void UpdateDrawFrame(void);          // Update and draw one frame
+static void UpdateDrawFrame(void); // Update and draw one frame
 
 //----------------------------------------------------------------------------------
 // Program main entry point
@@ -80,13 +80,13 @@ int main(void)
     //---------------------------------------------------------
     InitWindow(screenWidth, screenHeight, "lenny-raylib-template");
 
-    InitAudioDevice();      // Initialize audio device
+    InitAudioDevice(); // Initialize audio device
 
-    rlImGuiSetup(true);     // Initialize Dear ImGui (dark theme)
+    rlImGuiSetup(true); // Initialize Dear ImGui (dark theme)
 
     // Load global data (assets that must be available in all screens, i.e. font)
     font = LoadFont("resources/mecha.png");
-    //music = LoadMusicStream("resources/ambient.ogg"); // TODO: Load music
+    // music = LoadMusicStream("resources/ambient.ogg"); // TODO: Load music
     fxCoin = LoadSound("resources/coin.wav");
 
     SetMusicVolume(music, 1.0f);
@@ -99,11 +99,11 @@ int main(void)
 #if defined(PLATFORM_WEB)
     emscripten_set_main_loop(UpdateDrawFrame, 60, 1);
 #else
-    SetTargetFPS(60);       // Set our game to run at 60 frames-per-second
+    SetTargetFPS(60); // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
 
     // Main game loop
-    while (!WindowShouldClose())    // Detect window close button or ESC key
+    while (!WindowShouldClose()) // Detect window close button or ESC key
     {
         UpdateDrawFrame();
     }
@@ -127,11 +127,11 @@ int main(void)
     UnloadMusicStream(music);
     UnloadSound(fxCoin);
 
-    rlImGuiShutdown();      // Shut down Dear ImGui
+    rlImGuiShutdown(); // Shut down Dear ImGui
 
-    CloseAudioDevice();     // Close audio context
+    CloseAudioDevice(); // Close audio context
 
-    CloseWindow();          // Close window and OpenGL context
+    CloseWindow(); // Close window and OpenGL context
     //--------------------------------------------------------------------------------------
 
     return 0;
@@ -219,7 +219,7 @@ static void UpdateTransition(void)
             transFadeOut = true;
         }
     }
-    else  // Transition fade out logic
+    else // Transition fade out logic
     {
         transAlpha -= 0.02f;
 
@@ -245,80 +245,83 @@ static void UpdateDrawFrame(void)
 {
     // Update
     //----------------------------------------------------------------------------------
-    //UpdateMusicStream(music);       // NOTE: Music keeps playing between screens
+    // UpdateMusicStream(music);       // NOTE: Music keeps playing between screens
 
     if (!onTransition)
     {
-        switch(currentScreen)
+        switch (currentScreen)
         {
             case LOGO:
             {
                 UpdateLogoScreen();
 
                 if (FinishLogoScreen()) TransitionToScreen(TITLE);
-
-            } break;
+            }
+            break;
             case TITLE:
             {
                 UpdateTitleScreen();
 
-                if (FinishTitleScreen() == 1) TransitionToScreen(OPTIONS);
-                else if (FinishTitleScreen() == 2) TransitionToScreen(GAMEPLAY);
-
-            } break;
+                if (FinishTitleScreen() == 1)
+                    TransitionToScreen(OPTIONS);
+                else if (FinishTitleScreen() == 2)
+                    TransitionToScreen(GAMEPLAY);
+            }
+            break;
             case OPTIONS:
             {
                 UpdateOptionsScreen();
 
                 if (FinishOptionsScreen()) TransitionToScreen(TITLE);
-
-            } break;
+            }
+            break;
             case GAMEPLAY:
             {
                 UpdateGameplayScreen();
 
                 if (FinishGameplayScreen() == 1) TransitionToScreen(ENDING);
-                //else if (FinishGameplayScreen() == 2) TransitionToScreen(TITLE);
-
-            } break;
+                // else if (FinishGameplayScreen() == 2) TransitionToScreen(TITLE);
+            }
+            break;
             case ENDING:
             {
                 UpdateEndingScreen();
 
                 if (FinishEndingScreen() == 1) TransitionToScreen(TITLE);
-
-            } break;
+            }
+            break;
             default: break;
         }
     }
-    else UpdateTransition();    // Update transition (fade-in, fade-out)
+    else
+        UpdateTransition(); // Update transition (fade-in, fade-out)
     //----------------------------------------------------------------------------------
 
     // Draw
     //----------------------------------------------------------------------------------
     BeginDrawing();
 
-        ClearBackground(RAYWHITE);
+    ClearBackground(RAYWHITE);
 
-        switch(currentScreen)
-        {
-            case LOGO: DrawLogoScreen(); break;
-            case TITLE: DrawTitleScreen(); break;
-            case OPTIONS: DrawOptionsScreen(); break;
-            case GAMEPLAY: DrawGameplayScreen(); break;
-            case ENDING: DrawEndingScreen(); break;
-            default: break;
-        }
+    switch (currentScreen)
+    {
+        case LOGO: DrawLogoScreen(); break;
+        case TITLE: DrawTitleScreen(); break;
+        case OPTIONS: DrawOptionsScreen(); break;
+        case GAMEPLAY: DrawGameplayScreen(); break;
+        case ENDING: DrawEndingScreen(); break;
+        default: break;
+    }
 
-        // Draw full screen rectangle in front of everything
-        if (onTransition) DrawTransition();
+    // Draw full screen rectangle in front of everything
+    if (onTransition) DrawTransition();
 
-        // Dear ImGui overlay: replace the demo window with your own ig* calls
-        rlImGuiBegin();
-        igShowDemoWindow(NULL);
-        rlImGuiEnd();
+    // Dear ImGui overlay: replace the demo window with your own ig* calls
+    rlImGuiBegin();
+    igShowDemoWindow(NULL);
+    rlImGuiEnd();
 
-        //DrawFPS(10, 10);
+    // DrawFPS(10, 10);
 
     EndDrawing();
     //----------------------------------------------------------------------------------
