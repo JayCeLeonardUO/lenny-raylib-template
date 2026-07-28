@@ -3,6 +3,8 @@
 #ifndef MYLIB_H
 #define MYLIB_H
 
+// ---- hexmath.c (declarations) ----
+
 // ---- mymath.c (declarations) ----
 /*******************************************************************************************
 *
@@ -21,6 +23,8 @@ float MyLerpF(float start, float end, float amount);
 #ifdef MYLIB_IMPLEMENTATION
 #ifndef MYLIB_IMPLEMENTATION_DONE
 #define MYLIB_IMPLEMENTATION_DONE
+
+// ---- hexmath.c ----
 
 // ---- mymath.c ----
 int MyClampInt(int value, int min, int max)
