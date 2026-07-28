@@ -21,7 +21,9 @@ set(IMPLS "")
 foreach(source ${SOURCES})
     get_filename_component(name "${source}" NAME)
     file(READ "${source}" contents)
-    string(REGEX REPLACE "[ \t]*#[ \t]*include[ \t]+\"[^\"]*\"[^\n]*\n" "" contents "${contents}")
+    # Strip only self-references; external includes ("raylib.h", <stdbool.h>, ...)
+    # are kept so the generated header is self-sufficient
+    string(REGEX REPLACE "[ \t]*#[ \t]*include[ \t]+\"mylib.h\"[^\n]*\n" "" contents "${contents}")
 
     # First top-level function definition marks the start of the implementation part
     string(REGEX MATCH "\n[A-Za-z_][^\n;{}]*\\([^)]*\\)[ \t\r]*\n\\{" first_func "${contents}")

@@ -1,2 +1,10 @@
 CompileFlags:
   CompilationDatabase: build
+---
+# mylibs/*.c are amalgamated into mylib.h, never compiled directly, so they
+# are not in the compile database; give clangd the raylib include path
+# (relative paths resolve against the source file's directory)
+If:
+  PathMatch: .*/mylibs/.*\.c
+CompileFlags:
+  Add: [-I../build/_deps/raylib-src/src]
