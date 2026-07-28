@@ -39,9 +39,23 @@ add_library(rlimgui STATIC vendor/rlImGui/rlImGui.cpp)
 target_include_directories(rlimgui PUBLIC vendor/rlImGui)
 target_link_libraries(rlimgui PUBLIC imgui raylib)
 
+# mylibs unity build: amalgamate mylibs/*.h + *.c into mylibs/mylib.h
+# (stb-style, committed so the plain Makefile/CI builds need no codegen)
+file(GLOB MYLIBS_FILES CONFIGURE_DEPENDS mylibs/*.h mylibs/*.c)
+list(REMOVE_ITEM MYLIBS_FILES ${CMAKE_SOURCE_DIR}/mylibs/mylib.h)
+add_custom_command(
+    OUTPUT ${CMAKE_SOURCE_DIR}/mylibs/mylib.h
+    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_SOURCE_DIR}/mylibs/amalgamate.cmake
+    DEPENDS ${MYLIBS_FILES} mylibs/amalgamate.cmake
+    COMMENT "Amalgamating mylibs/ into mylib.h"
+)
+add_custom_target(mylib_header DEPENDS ${CMAKE_SOURCE_DIR}/mylibs/mylib.h)
+
 # Our Project
 add_executable(${PROJECT_NAME})
 add_subdirectory(src)
+add_dependencies(${PROJECT_NAME} mylib_header)
+target_include_directories(${PROJECT_NAME} PRIVATE mylibs)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PROJECT_NAME})

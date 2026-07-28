@@ -11,6 +11,7 @@
 ********************************************************************************************/
 
 #include "raylib.h"
+#define MYLIB_IMPLEMENTATION
 #include "screens.h"    // NOTE: Declares global (extern) variables and screens functions
 
 #include "rlImGui.h"    // raylib backend for Dear ImGui

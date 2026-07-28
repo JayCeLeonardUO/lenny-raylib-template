@@ -24,6 +24,10 @@ When setting up this template on linux for the first time, install the dependenc
 
 This repository comes with CMake and a plain Makefile already set up.
 
+### mylibs
+
+Drop reusable `.h`/`.c` pairs into `mylibs/` and the CMake build amalgamates them into a single stb-style header, `mylibs/mylib.h` (or regenerate manually with `cmake -P mylibs/amalgamate.cmake`). The header is included via `src/screens.h`, so everything in `mylibs/` is usable from `main.c` and every screen file; `main.c` defines `MYLIB_IMPLEMENTATION` so the implementations compile exactly once. The generated `mylib.h` is committed so the plain Makefile builds (and CI) work without a codegen step.
+
 ### CLI: Makefile
 
 ```sh
