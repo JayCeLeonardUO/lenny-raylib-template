@@ -39,10 +39,9 @@ add_library(rlimgui STATIC vendor/rlImGui/rlImGui.cpp)
 target_include_directories(rlimgui PUBLIC vendor/rlImGui)
 target_link_libraries(rlimgui PUBLIC imgui raylib)
 
-# mylibs unity build: amalgamate mylibs/*.h + *.c into mylibs/mylib.h
-# (stb-style, committed so the plain Makefile/CI builds need no codegen)
-file(GLOB MYLIBS_FILES CONFIGURE_DEPENDS mylibs/*.h mylibs/*.c)
-list(REMOVE_ITEM MYLIBS_FILES ${CMAKE_SOURCE_DIR}/mylibs/mylib.h)
+# mylibs unity build: amalgamate mylibs/*.c into mylibs/mylib.h
+# (committed so the plain Makefile/CI builds need no codegen)
+file(GLOB MYLIBS_FILES CONFIGURE_DEPENDS mylibs/*.c)
 add_custom_command(
     OUTPUT ${CMAKE_SOURCE_DIR}/mylibs/mylib.h
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_SOURCE_DIR}/mylibs/amalgamate.cmake
