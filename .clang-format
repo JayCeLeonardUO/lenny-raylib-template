@@ -25,3 +25,6 @@ SpaceAfterCStyleCast: false
 
 # Switch
 IndentCaseLabels: true
+
+# Blank line between functions/structs/enums
+SeparateDefinitionBlocks: Always
